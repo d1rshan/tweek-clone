@@ -9,22 +9,42 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final items = [
+  final List<dynamic> items = [
     MyDateDayWidget(date: 'Feb 17', day: 'Mon'),
-    MyTaskWidget(task: ''),
+    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
     MyDateDayWidget(date: 'Feb 18', day: 'Tue'),
-    MyTaskWidget(task: ''),
+    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
     MyDateDayWidget(date: 'Feb 19', day: 'Wed'),
-    MyTaskWidget(task: ''),
+    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
     MyDateDayWidget(date: 'Feb 20', day: 'Thu'),
-    MyTaskWidget(task: ''),
+    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
     MyDateDayWidget(date: 'Feb 21', day: 'Fri'),
-    MyTaskWidget(task: ''),
+    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
     MyDateDayWidget(date: 'Feb 22', day: 'Sat'),
-    MyTaskWidget(task: ''),
+    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
     MyDateDayWidget(date: 'Feb 23', day: 'Sun'),
-    MyTaskWidget(task: ''),
+    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
   ];
+
+  void _addTask(String newTask, int index) {
+    setState(() {
+      items[index] = MyTaskWidget(
+        task: newTask,
+        onTaskEntered: (t) {}, // No callback needed for filled tasks
+      );
+
+      int insertIndex = index + 1;
+
+      while (insertIndex < items.length && items[insertIndex] is MyTaskWidget) {
+        insertIndex++; // Move past existing tasks
+      }
+
+      items.insert(
+          insertIndex,
+          MyTaskWidget(
+              task: '', onTaskEntered: (t) => _addTask(t, insertIndex)));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,41 +54,49 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              // APP BAR
               MyAppBar(),
-              Divider(
-                height: 30,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-
               Expanded(
-                  child: ReorderableListView.builder(
-                itemCount: items.length,
-                buildDefaultDragHandles:
-                    false, // Removes the trailing reorder icon
-                itemBuilder: (context, index) {
-                  final item = items[index];
+                child: ReorderableListView.builder(
+                  itemCount: items.length,
+                  buildDefaultDragHandles: false,
+                  itemBuilder: (context, index) {
+                    final item = items[index];
 
-                  if (item is MyTaskWidget) {
-                    return ReorderableDragStartListener(
-                      key: ValueKey(index), // Unique key
-                      index: index,
+                    if (item is MyTaskWidget) {
+                      if (item.task.isNotEmpty) {
+                        return ReorderableDragStartListener(
+                          key: ValueKey(index),
+                          index: index,
+                          child: MyTaskWidget(
+                            task: item.task,
+                            onTaskEntered: (newTask) =>
+                                _addTask(newTask, index),
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          key: ValueKey(index),
+                          child: MyTaskWidget(
+                            task: item.task,
+                            onTaskEntered: (newTask) =>
+                                _addTask(newTask, index),
+                          ),
+                        );
+                      }
+                    }
+
+                    return Container(
+                      key: ValueKey(index),
                       child: item,
                     );
-                  }
-
-                  return Container(
-                    key: ValueKey(index),
-                    child: item,
-                  );
-                },
-                onReorder: (int oldIndex, int newIndex) {
-                  if (newIndex > oldIndex) newIndex--; // Adjust for index shift
-                  final item = items.removeAt(oldIndex);
-                  items.insert(newIndex, item);
-                },
-              )),
-              // MAIN PART OF APP
+                  },
+                  onReorder: (int oldIndex, int newIndex) {
+                    if (newIndex > oldIndex) newIndex--;
+                    final item = items.removeAt(oldIndex);
+                    items.insert(newIndex, item);
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -89,16 +117,16 @@ class MyAppBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          'Feb 2025',
+          'February 2025',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         Row(
           children: [
             MyNavigationButton(iconData: Icons.person),
             Gap(5),
-            MyNavigationButton(iconData: Icons.arrow_back),
+            MyNavigationButton(iconData: Icons.arrow_back_ios_new),
             Gap(5),
-            MyNavigationButton(iconData: Icons.arrow_forward),
+            MyNavigationButton(iconData: Icons.arrow_forward_ios),
           ],
         ),
       ],
@@ -106,14 +134,22 @@ class MyAppBar extends StatelessWidget {
   }
 }
 
-class MyTaskWidget extends StatelessWidget {
+class MyTaskWidget extends StatefulWidget {
   final String task;
+  final Function(String) onTaskEntered;
 
   const MyTaskWidget({
     super.key,
     required this.task,
+    required this.onTaskEntered,
   });
 
+  @override
+  State<MyTaskWidget> createState() => _MyTaskWidgetState();
+}
+
+class _MyTaskWidgetState extends State<MyTaskWidget> {
+  bool isDone = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -122,10 +158,52 @@ class MyTaskWidget extends StatelessWidget {
       decoration: BoxDecoration(
         border: BorderDirectional(
           bottom: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1),
+              color: Theme.of(context).colorScheme.secondary, width: 1),
         ),
       ),
-      child: Text(task),
+      child: widget.task.isEmpty
+          ? TextField(
+              style: Theme.of(context).textTheme.bodyMedium,
+              cursorWidth: 1,
+              cursorHeight: 20,
+              cursorColor: Theme.of(context).colorScheme.inversePrimary,
+              decoration: null,
+              onSubmitted: (newTask) {
+                if (newTask.trim().isNotEmpty) {
+                  widget.onTaskEntered(newTask.trim());
+                }
+              },
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.task,
+                  style: isDone
+                      ? TextStyle(
+                          color: Colors.grey,
+                          decoration: TextDecoration.lineThrough,
+                          decorationThickness: 2,
+                          decorationColor: Colors.grey,
+                        )
+                      : null,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isDone = !isDone;
+                    });
+                  },
+                  child: Icon(
+                    isDone
+                        ? Icons.check_circle
+                        : Icons.check_circle_outline_rounded,
+                    size: 18,
+                    color: isDone ? Colors.grey : Colors.white,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }
@@ -147,7 +225,7 @@ class MyDateDayWidget extends StatelessWidget {
       decoration: BoxDecoration(
         border: BorderDirectional(
           bottom: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1),
+              color: Theme.of(context).colorScheme.inversePrimary, width: 1),
         ),
       ),
       child: Row(
@@ -182,9 +260,12 @@ class MyNavigationButton extends StatelessWidget {
       padding: EdgeInsets.all(10),
       decoration: ShapeDecoration(
         shape: CircleBorder(),
-        color: Theme.of(context).colorScheme.primary,
+        color: Theme.of(context).colorScheme.secondary,
       ),
-      child: Icon(iconData),
+      child: Icon(
+        iconData,
+        size: 16,
+      ),
     );
   }
 }

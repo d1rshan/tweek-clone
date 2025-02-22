@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 final darkTheme = ThemeData(
-    fontFamily: 'Poppins',
+    fontFamily: 'SuisseIntl',
     colorScheme: ColorScheme.dark(
-      surface: Colors.black,
-      primary: Color.fromRGBO(39, 40, 43, 1.0),
-      tertiary: Color.fromRGBO(14, 14, 14, 1.0),
+      primary: Colors.black,
+      inversePrimary: Colors.white,
+      secondary: Color.fromRGBO(39, 40, 43, 1.0),
     ),
     textTheme: TextTheme(
       titleLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
