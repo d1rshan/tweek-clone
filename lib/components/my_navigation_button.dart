@@ -16,14 +16,17 @@ class MyNavigationButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
         decoration: ShapeDecoration(
           shape: CircleBorder(),
-          color: Theme.of(context).colorScheme.secondary,
+          color: Color.fromRGBO(190, 156, 243, 1),
         ),
-        child: Icon(
-          iconData,
-          size: 16,
+        child: Text(
+          'DP',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.white,
+          ),
         ),
       ),
     );

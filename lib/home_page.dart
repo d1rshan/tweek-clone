@@ -1,55 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tweek_clone/components/my_app_bar.dart';
 import 'package:tweek_clone/components/my_date_day_widget.dart';
-import 'package:tweek_clone/components/my_task_widget.dart';
+import 'package:tweek_clone/riverpod.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(tasksProvider);
 
-class _HomePageState extends State<HomePage> {
-  final List<dynamic> items = [
-    MyDateDayWidget(date: 'Feb 17', day: 'Mon'),
-    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
-    MyDateDayWidget(date: 'Feb 18', day: 'Tue'),
-    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
-    MyDateDayWidget(date: 'Feb 19', day: 'Wed'),
-    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
-    MyDateDayWidget(date: 'Feb 20', day: 'Thu'),
-    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
-    MyDateDayWidget(date: 'Feb 21', day: 'Fri'),
-    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
-    MyDateDayWidget(date: 'Feb 22', day: 'Sat'),
-    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
-    MyDateDayWidget(date: 'Feb 23', day: 'Sun'),
-    MyTaskWidget(task: '', onTaskEntered: (_) {}), // Empty task for this day
-  ];
-
-  void _addTask(String newTask, int index) {
-    setState(() {
-      items[index] = MyTaskWidget(
-        task: newTask,
-        onTaskEntered: (t) {}, // No callback needed for filled tasks
-      );
-
-      int insertIndex = index + 1;
-
-      while (insertIndex < items.length && items[insertIndex] is MyTaskWidget) {
-        insertIndex++; // Move past existing tasks
-      }
-
-      items.insert(
-          insertIndex,
-          MyTaskWidget(
-              task: '', onTaskEntered: (t) => _addTask(t, insertIndex)));
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -57,6 +18,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               MyAppBar(),
+              MyDateDayWidget(date: 'Feb 23', day: 'Sun'),
               Expanded(
                 child: ReorderableListView.builder(
                   itemCount: items.length,
@@ -64,27 +26,12 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (context, index) {
                     final item = items[index];
 
-                    if (item is MyTaskWidget) {
-                      if (item.task.isNotEmpty) {
-                        return ReorderableDragStartListener(
-                          key: ValueKey(index),
-                          index: index,
-                          child: MyTaskWidget(
-                            task: item.task,
-                            onTaskEntered: (newTask) =>
-                                _addTask(newTask, index),
-                          ),
-                        );
-                      } else {
-                        return Container(
-                          key: ValueKey(index),
-                          child: MyTaskWidget(
-                            task: item.task,
-                            onTaskEntered: (newTask) =>
-                                _addTask(newTask, index),
-                          ),
-                        );
-                      }
+                    if (item.task.isNotEmpty) {
+                      return ReorderableDragStartListener(
+                        key: ValueKey(index),
+                        index: index,
+                        child: item,
+                      );
                     }
 
                     return Container(
@@ -93,7 +40,15 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   onReorder: (int oldIndex, int newIndex) {
+                    if (oldIndex == items.length - 1) {
+                      return;
+                    }
                     if (newIndex > oldIndex) newIndex--;
+
+                    if (newIndex >= items.length - 1) {
+                      newIndex = items.length - 2;
+                    }
+
                     final item = items.removeAt(oldIndex);
                     items.insert(newIndex, item);
                   },

@@ -1,33 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tweek_clone/riverpod.dart';
 
-class MyTaskWidget extends StatefulWidget {
+class MyTaskWidget extends ConsumerWidget {
   final String task;
-  final Function(String) onTaskEntered;
+  final bool isDone;
 
-  const MyTaskWidget({
-    super.key,
-    required this.task,
-    required this.onTaskEntered,
-  });
-
+  const MyTaskWidget({super.key, this.task = '', this.isDone = false});
   @override
-  State<MyTaskWidget> createState() => _MyTaskWidgetState();
-}
-
-class _MyTaskWidgetState extends State<MyTaskWidget> {
-  bool isDone = false;
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10),
       alignment: Alignment.centerLeft,
       decoration: BoxDecoration(
         border: BorderDirectional(
           bottom: BorderSide(
-              color: Theme.of(context).colorScheme.secondary, width: 1),
+            color: Theme.of(context).colorScheme.secondary,
+            width: 1,
+          ),
         ),
       ),
-      child: widget.task.isEmpty
+      child: task.isEmpty
           ? TextField(
               style: Theme.of(context).textTheme.bodyMedium,
               cursorWidth: 1,
@@ -35,16 +28,21 @@ class _MyTaskWidgetState extends State<MyTaskWidget> {
               cursorColor: Theme.of(context).colorScheme.inversePrimary,
               decoration: null,
               onSubmitted: (newTask) {
-                if (newTask.trim().isNotEmpty) {
-                  widget.onTaskEntered(newTask.trim());
-                }
+                ref.read(tasksProvider.notifier).update((state) {
+                  List list = [...state];
+                  list.removeLast();
+                  list.add(MyTaskWidget(task: newTask));
+                  list.add(MyTaskWidget());
+
+                  return list;
+                });
               },
             )
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.task,
+                  task,
                   style: isDone
                       ? TextStyle(
                           color: Colors.grey,
@@ -56,9 +54,9 @@ class _MyTaskWidgetState extends State<MyTaskWidget> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    setState(() {
-                      isDone = !isDone;
-                    });
+                    // setState(() {
+                    //   isDone = !isDone;
+                    // });
                   },
                   child: Icon(
                     isDone

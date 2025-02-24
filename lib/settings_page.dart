@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:tweek_clone/theme.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -7,7 +8,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.tertiary,
+      backgroundColor: lightPurple,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -16,23 +17,19 @@ class SettingsPage extends StatelessWidget {
             children: [
               Text(
                 'Darshan Paccha',
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                style: titleLarge(),
               ),
               Gap(20),
               Text(
                 'Account',
-                style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                style: titleSmall(),
               ),
               Gap(5),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                  color: purple,
                 ),
                 child: Column(
                   children: [
@@ -47,16 +44,14 @@ class SettingsPage extends StatelessWidget {
               Gap(20),
               Text(
                 'App Preferences',
-                style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                style: titleSmall(),
               ),
               Gap(5),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                  color: purple,
                 ),
                 child: Column(
                   children: [
@@ -76,7 +71,7 @@ class SettingsPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                  color: purple,
                 ),
                 child: Column(
                   children: [
@@ -118,7 +113,7 @@ class MySettingsTile extends StatelessWidget {
         border: !isLastItem
             ? BorderDirectional(
                 bottom: BorderSide(
-                  color: Color.fromRGBO(154, 145, 168, 1),
+                  color: darkerPurple,
                 ),
               )
             : null,
@@ -128,24 +123,19 @@ class MySettingsTile extends StatelessWidget {
         children: [
           Text(
             leading,
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
+            style: bodyMedium(),
           ),
           Row(
             children: [
               Text(
                 trailing,
-                style: TextStyle(
-                  color: Color.fromRGBO(154, 145, 168, 1),
-                ),
+                style: bodyMedium(color: darkerPurple),
               ),
               Gap(15),
               Icon(
                 Icons.arrow_forward_ios,
                 size: 18,
-                color: Color.fromRGBO(154, 145, 168, 1),
+                color: darkerPurple,
               ),
             ],
           ),

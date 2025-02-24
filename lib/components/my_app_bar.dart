@@ -3,22 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:tweek_clone/components/my_navigation_button.dart';
 import 'package:tweek_clone/settings_page.dart';
+import 'package:tweek_clone/theme.dart';
 
 class MyAppBar extends StatelessWidget {
   const MyAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Column(
       children: [
-        Text(
-          'Feb 2025',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text(
+              'Feb 2025',
+              style: titleLarge(color: white),
+            ),
             MyNavigationButton(
               iconData: Icons.person,
               onTap: () {
@@ -30,11 +31,13 @@ class MyAppBar extends StatelessWidget {
                 );
               },
             ),
-            Gap(5),
-            MyNavigationButton(iconData: Icons.arrow_back_ios_new),
-            Gap(5),
-            MyNavigationButton(iconData: Icons.arrow_forward_ios),
           ],
+        ),
+        Gap(15),
+        Divider(
+          height: 0,
+          color: grey,
+          thickness: 2,
         ),
       ],
     );
@@ -52,7 +55,7 @@ class MyBottomSheet extends StatelessWidget {
       padding: EdgeInsets.all(20),
       height: MediaQuery.sizeOf(context).height * 0.25,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
+        color: lightPurple,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
@@ -66,12 +69,11 @@ class MyBottomSheet extends StatelessWidget {
             children: [
               Text(
                 'Darshan Paccha',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                style: titleMedium(),
               ),
               GestureDetector(
                 onTap: () {
+                  Navigator.pop(context);
                   Navigator.push(
                     context,
                     CupertinoPageRoute(
@@ -82,14 +84,12 @@ class MyBottomSheet extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: black,
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Text(
                     'Settings',
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.tertiary,
-                        ),
+                    style: bodyMedium(color: lightPurple),
                   ),
                 ),
               ),
@@ -101,7 +101,7 @@ class MyBottomSheet extends StatelessWidget {
             alignment: Alignment.centerLeft,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: Theme.of(context).colorScheme.tertiaryContainer,
+              color: purple,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,20 +110,18 @@ class MyBottomSheet extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.calendar_today,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: black,
                     ),
                     Gap(10),
                     Text(
                       'My Calendar',
-                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                      style: titleSmall(),
                     ),
                   ],
                 ),
                 Icon(
                   Icons.check,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: black,
                 ),
               ],
             ),
